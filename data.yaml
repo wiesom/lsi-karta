@@ -1,0 +1,164 @@
+- title: Sveriges minsta brandstation
+  latitude: 64.17023920744649
+  longitude: 20.94227199628674
+  icon: fire
+  layer: ""
+  image: ""
+  description: <p>Somthing something</p>
+- title: Grillplats
+  latitude: 64.1656441908743
+  longitude: 20.937227945047024
+  icon: grill
+  layer: ""
+  image: ""
+  description: <p>Somthing something</p>
+- title: Barnens bokskåp
+  latitude: 64.16334405407711
+  longitude: 20.939003649932495
+  icon: book
+  layer: ""
+  image: ""
+  description: <p>Somthing something</p>
+
+## Bänkar
+- title: Bänk
+  latitude: 64.17593
+  longitude: 20.90747
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #1"
+- title: Bänk
+  latitude: 64.15578
+  longitude: 20.91039
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #2"
+- title: Bänk
+  latitude: 64.1562
+  longitude: 20.91793
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #3"
+- title: Bänk
+  latitude: 64.15601 
+  longitude: 20.92469
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #4"
+- title: Bänk
+  latitude: 64.15765
+  longitude: 20.93955
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #5"
+- title: Bänk
+  latitude: 64.16916 
+  longitude: 20.93675
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #6 - Järnvägen/kustlandsvägen"
+- title: Bänk
+  latitude: 64.17027
+  longitude: 20.94224
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #7 - brandstation"
+- title: Bänk
+  latitude: 64.16887
+  longitude: 20.95137
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #8"
+- title: Bänk
+  latitude: 64.1669
+  longitude: 20.95574
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #9"
+- title: Bänk
+  latitude: 64.16332 
+  longitude: 20.94454
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #10"
+- title: Bänk
+  latitude: 64.16596
+  longitude: 20.96763
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #11"
+- title: Bänk
+  latitude: 64.16209 
+  longitude: 20.96627
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #12"
+- title: Bänk
+  latitude: 64.15923 
+  longitude: 20.95832
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #13"
+- title: Bänk
+  latitude: 64.15816
+  longitude: 20.96771
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #14"
+- title: Bänk
+  latitude: 64.15819
+  longitude: 20.96967
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #15"
+- title: Bänk
+  latitude: 64.15863 
+  longitude: 20.97208
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #16"
+- title: Bänk
+  latitude: 64.16078 
+  longitude: 20.98199
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #17"  
+- title: Bänk
+  latitude: 64.16077 
+  longitude: 20.98426
+  icon: help
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #18"
+- title: Bänk
+  latitude: 64.1609
+  longitude: 20.98538
+  icon: help
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #19"
+- title: Bänk
+  latitude: 64.16321 
+  longitude: 21.00156
+  icon: bench
+  layer: "Bänkar"
+  image: ""
+  description: "Bänk #20"
+
