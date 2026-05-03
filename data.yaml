@@ -1,21 +1,21 @@
 - title: Sveriges minsta brandstation
   latitude: 64.17023920744649
   longitude: 20.94227199628674
-  icon: fire
+  icon: firestation
   layer: ""
   image: ""
   description: <p>Somthing something</p>
 - title: Grillplats
   latitude: 64.1656441908743
   longitude: 20.937227945047024
-  icon: grill
+  icon: firepit
   layer: ""
   image: ""
   description: <p>Somthing something</p>
 - title: Barnens bokskåp
   latitude: 64.16334405407711
   longitude: 20.939003649932495
-  icon: book
+  icon: library
   layer: ""
   image: ""
   description: <p>Somthing something</p>
@@ -143,17 +143,23 @@
 - title: Bänk
   latitude: 64.16077 
   longitude: 20.98426
-  icon: help
+  approximate: true
+  icon: bench
   layer: "Bänkar"
   image: ""
-  description: "Bänk #18"
+  description: |
+    <p>Bänk #18</p>
+    <p>OBS: <i>Vet inte vart denna bänk är placerad</i></p>
 - title: Bänk
   latitude: 64.1609
   longitude: 20.98538
-  icon: help
+  approximate: true
+  icon: bench
   layer: "Bänkar"
   image: ""
-  description: "Bänk #19"
+  description: |
+    <p>Bänk #19</p>
+    <p>OBS: <i>Vet inte vart denna bänk är placerad</i></p>
 - title: Bänk
   latitude: 64.16321 
   longitude: 21.00156

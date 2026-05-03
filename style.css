@@ -54,23 +54,28 @@ body, html {
     border-top-color: rgba(0, 0, 0, 0.85);
 }
 
-/* Container for the emoji icon */
+/* This is your original styling */
 .custom-div-icon div {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.6); /* White with 60% opacity */
-    border: 2px solid rgba(255, 255, 255, 0.8); /* Brighter white border */
-    border-radius: 50%; /* Makes it a circle */
+    background: rgba(255, 255, 255, 0.6); 
+    border: 2px solid rgba(255, 255, 255, 0.8); 
+    border-radius: 50%; 
     width: 34px;
     height: 34px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    
-    /* Optional: blurs the satellite map behind the icon for extra legibility */
     backdrop-filter: blur(2px); 
-    
-    /* Ensure the emoji stays centered */
-    line-height: 1;
 }
 
-/* Adjust the icon size in JS to match this or vice versa */
+/* Ensure the OSM SVG image inside looks crisp */
+.custom-div-icon div img {
+    display: block;
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+/* NEW: The style for inexact locations */
+.location-approximate div {
+    border: 2px solid rgba(255, 0, 0, 0.8) !important; /* Bold Red Border */
+    background: rgba(255, 200, 200, 0.6); /* Slight reddish tint to the background */
+}

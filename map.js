@@ -1,12 +1,12 @@
-// 1. Define the different tile layers (Basemaps)
+const symbolCredit = ' | Symbols by <a href="https://github.com/openstreetmap-carto/openstreetmap-carto">OSM Carto</a>';
+
 const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
-    attribution: '© OpenStreetMap contributors'
+    attribution: '© OpenStreetMap contributors' + symbolCredit
 });
 
-
 const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri'
+    attribution: 'Tiles &copy; Esri' + symbolCredit
 });
 
 // 2. Initialize the map
@@ -31,22 +31,32 @@ const overlays = {
 
 L.control.layers(baseMaps, overlays).addTo(map);
 
-// 4. Helper to create icons
-function createCustomIcon(iconName) {
-    const iconMap = {
-        'fire': '🚒',
-        'grill': '🔥',
-        'book': '📚',
-        'bench': '🪑', // Or '🛋️' or '🪵' depending on the vibe
-        'help': '❓',
-        'default': '📍'
+function createCustomIcon(iconName, isApproximate = false) {
+    const symbolPath = 'symbols/'; 
+
+    const iconFiles = {
+        'bench': 'bench.svg',
+        'firepit': 'firepit.svg',
+        'firestation': 'firestation.svg',
+        'library': 'library.svg',
+        'help': 'query.svg',
+        'default': 'marker.svg'
     };
-    const iconHtml = iconMap[iconName] || iconMap['default'];
+
+    const fileName = iconFiles[iconName] || iconFiles['default'];
+
+    // Decide which class to use
+    let className = 'custom-div-icon';
+    if (isApproximate) {
+        className += ' location-approximate';
+    }
+
     return L.divIcon({
-        html: `<div style="font-size: 24px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));">${iconHtml}</div>`,
-        className: 'custom-div-icon',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15]
+        // We put the image inside the styled div
+        html: `<div><img src="${symbolPath}${fileName}" style="width: 25px; height: 25px;"></div>`,
+        className: className,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17]
     });
 }
 
@@ -59,7 +69,7 @@ async function loadMarkers() {
 
         const markers = [];
         points.forEach(p => {
-            const customIcon = createCustomIcon(p.icon);
+            const customIcon = createCustomIcon(p.icon, p.approximate);
             const marker = L.marker([p.latitude, p.longitude], { 
                 icon: customIcon,
                 alt: p.title,
