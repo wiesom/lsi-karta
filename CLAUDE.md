@@ -35,9 +35,9 @@ Det finns inga tester, ingen linter och inget byggsteg.
 
 ## Data
 
-- `data.json` är den fil sidan läser. `data.yaml` innehåller samma data i ett mer lättredigerat format, men det finns ingen automatisk konvertering – **båda måste hållas i synk vid varje ändring**. Kontrollera med:
+- `data.json` är den enda datakällan (en tidigare `data.yaml` togs bort för att slippa hålla två filer i synk). JSON tillåter inga kommentarer och är känslig för kommatecken – validera efter varje ändring:
   ```bash
-  python3 -c "import json,yaml; print(yaml.safe_load(open('data.yaml')) == json.load(open('data.json')))"
+  python3 -m json.tool data.json > /dev/null && echo OK
   ```
 - Fält per punkt: `title`, `latitude`, `longitude`, `icon`, `layer`, `image`, `description` (HTML, infogas oescapad i popupen), valfritt `approximate`.
 
@@ -55,8 +55,9 @@ Användaren vill att varje ändring bedöms för säkerhetspåverkan – inget f
 
 - **CSP:** `index.html` har en Content Security Policy i en `<meta>`-tagg (GitHub Pages kan inte sätta headers). Skript får bara komma från sidan själv och unpkg; inline-skript, `onerror=` m.m. och inline `style=`-attribut i HTML blockeras. Lägg därför styling i `style.css`, inte i HTML-strängar. Ny extern källa (tiles, bilder, skript) kräver att CSP:n uppdateras – och en motivering. Bilder i datafältet `image` måste ligga i repot (`img-src 'self'`).
 - **Externa resurser:** script/CSS från CDN ska ha låst version och SRI-hash (`integrity`).
+- **Versionskontroll av beroenden:** Dependabot ser inte beroenden som laddas via `<script>`-taggar, så Leaflet och Leaflet.markercluster får inga automatiska larm. Kontrollera ett par gånger om året (senast kontrollerat: 2026-10-25) om det finns nya versioner eller säkerhetsrättelser (GitHub-releaser för `Leaflet/Leaflet` och `Leaflet/Leaflet.markercluster`). Påminn användaren om det har gått mer än sex månader sedan senaste kontrollen. Vid uppdatering: byt version i `index.html`, räkna om SRI-hasharna, testa sidan och uppdatera datumet här. Läge vid senaste kontroll: Leaflet 1.9.4 och markercluster 1.5.3 är senaste stabila. Leaflet 2.0 finns som alfa och är en större omskrivning med API-ändringar – byt inte förrän den är stabil, och räkna då med kodändringar och att markercluster måste stödja den.
 - **Indata till DOM:** allt som kommer från URL (`location.hash`), `localStorage` eller datafiler ska behandlas som otillförlitligt. Infoga aldrig sådant som HTML; validera typ (t.ex. `Number.isFinite`, `Array.isArray`) och slå upp nycklar med `Object.hasOwn`. `localStorage` delas av alla sidor på `wiesom.github.io`, eftersom de har samma origin.
-- **Datafilerna:** `title` och `image` sätts som text/attribut via DOM. Bara `description` infogas som HTML – CSP:n stoppar skript i den, men den kan fortfarande ändra sidans innehåll (falska länkar m.m.). Granska ändringar i `data.json`/`data.yaml` som kod, särskilt från andra bidragsgivare. Även nycklar från datan (`icon`, `layer`) slås upp med `Object.hasOwn`.
+- **Datafilerna:** `title` och `image` sätts som text/attribut via DOM. Bara `description` infogas som HTML – CSP:n stoppar skript i den, men den kan fortfarande ändra sidans innehåll (falska länkar m.m.). Granska ändringar i `data.json` som kod, särskilt från andra bidragsgivare. Även nycklar från datan (`icon`, `layer`) slås upp med `Object.hasOwn`.
 
 ## Kända brister (åtgärda eller uppdatera listan)
 
@@ -65,3 +66,5 @@ Inga kända just nu.
 ## Underhåll av denna fil
 
 Håll CLAUDE.md aktuell utan att bli ombedd: när en ändring påverkar något som beskrivs här (arkitektur, dataformat, lager, symboler, beroenden, publicering, kända brister) ska denna fil uppdateras i samma ändring/commit. Ta bort punkter under "Kända brister" när de är åtgärdade.
+
+Samma gäller dokumentationen för människor: `README.md` (medvetet vag tills kartan är släppt) och `docs/`. `docs/lagga-till-punkt.md` listar datafälten, tillgängliga symboler (`iconFiles`) och lager (`overlays`) och ska uppdateras när något av dem ändras. Allt i repot publiceras via GitHub Pages – även `.md`-filer, som renderas till HTML.
