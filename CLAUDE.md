@@ -24,9 +24,10 @@ Det finns inga tester, ingen linter och inget byggsteg.
 ## Arkitektur
 
 - `index.html` laddar Leaflet och markercluster från CDN och sedan `map.js` som ett vanligt (icke-modul) script.
+- Kartans maxzoom är 18, eftersom Esri saknar flygfoton över zoom 18 runt Sikeå. Varje baskarta måste ha samma `maxZoom` som kartan, annars ritas den inte på högsta zoom.
 - `map.js` skapar baskartor (OSM, Esri-flygfoto), overlay-lager och hämtar `data.json`. Varje punkt blir en `L.marker` med `L.divIcon`, tooltip (titel) och popup (titel, bild, beskrivning).
 - **Lager:** fältet `layer` i datan matchas mot nycklarna i objektet `overlays` i `map.js`. Okänt eller tomt värde hamnar i `"Övrigt"`. Ett nytt lager kräver i nuläget att det läggs till i `overlays`.
-- **Klustring:** alla markörer ligger i en gemensam `L.markerClusterGroup` (`clusters`), så att närliggande punkter från olika lager grupperas ihop (t.ex. brandstationen och bänk #7, som ligger några meter ifrån varandra). På högsta zoom är klustringen avstängd (`disableClusteringAtZoom`), och `spreadOverlappingMarkers()` lägger markörer som ändå skulle täcka varandra sida vid sida genom att förskjuta ikonen i pixlar (`createCustomIcon(..., offset)`) – koordinaterna ändras inte. Funktionen körs efter inläsning och när ett lager slås av/på. Markören bär sin datapunkt i `marker.poi` för att ikonen ska kunna återskapas. Lagergrupperna i `overlays` är tomma och fungerar bara som reglage i lagerkontrollen; `overlayMarkers` håller reda på vilka markörer som hör till vilket lager, och händelserna `overlayadd`/`overlayremove` lägger till eller tar bort dem ur klustret. Lägg alltså aldrig markörer direkt i ett overlay-lager.
+- **Klustring:** alla markörer ligger i en gemensam `L.markerClusterGroup` (`clusters`), så att närliggande punkter från olika lager grupperas ihop (t.ex. brandstationen och bänk #7, som ligger några meter ifrån varandra). Från zoom 17 är klustringen avstängd (`disableClusteringAtZoom`), och `spreadOverlappingMarkers()` lägger markörer som ändå skulle täcka varandra sida vid sida genom att förskjuta ikonen i pixlar (`createCustomIcon(..., offset)`) – koordinaterna ändras inte. Funktionen räknar på aktuell zoom och körs efter inläsning, vid varje `zoomend` och när ett lager slås av/på. Markören bär sin datapunkt i `marker.poi` för att ikonen ska kunna återskapas. Lagergrupperna i `overlays` är tomma och fungerar bara som reglage i lagerkontrollen; `overlayMarkers` håller reda på vilka markörer som hör till vilket lager, och händelserna `overlayadd`/`overlayremove` lägger till eller tar bort dem ur klustret. Lägg alltså aldrig markörer direkt i ett overlay-lager.
 - **Sparade inställningar:** vald grundkarta, avslagna lager (`hiddenOverlays`) och kartvy (center + zoom) sparas i `localStorage` under nyckeln `lsi-karta-settings` (`loadSettings()`/`saveSettings()`, fel ignoreras). Grundkarta och lager sparas med sina namn i `baseMaps`/`overlays` – byter man namn faller sparade val tillbaka till standard (OSM, alla lager på).
 - **Vy i URL:** kartvyn speglas i adressen som `#zoom/lat/lng` (`updateHash()` med `history.replaceState`, `hashchange` lyssnas på). Startvyn väljs i ordningen URL → sparad vy → `fitBounds` över alla punkter (`startView`).
 - **Symboler:** fältet `icon` slås upp i `iconFiles` i `createCustomIcon()` och pekar på en SVG i `symbols/` (OSM Carto-symboler, 14×14). En ny symbol kräver både SVG-filen och en rad i `iconFiles`.
@@ -39,6 +40,14 @@ Det finns inga tester, ingen linter och inget byggsteg.
   python3 -c "import json,yaml; print(yaml.safe_load(open('data.yaml')) == json.load(open('data.json')))"
   ```
 - Fält per punkt: `title`, `latitude`, `longitude`, `icon`, `layer`, `image`, `description` (HTML, infogas oescapad i popupen), valfritt `approximate`.
+
+## UI/UX
+
+Användaren vill att idéer och ändringar bedöms ur ett UI/UX-perspektiv innan de genomförs – även när de föreslås av användaren själv. Säg till om något sannolikt blir sämre för besökaren och föreslå ett bättre alternativ i stället för att bara genomföra det. Tänk särskilt på:
+
+- **Mobilen först:** många besökare använder kartan ute i terrängen på telefon – små skärmar, touch (ingen hover), solljus och dålig uppkoppling.
+- **Förutsägbarhet:** följ hur etablerade kartor (Google Maps, OpenStreetMap.org) beter sig; kartan ska inte hoppa eller ändra sig oväntat.
+- **Tillgänglighet:** läsbar kontrast, tillräckligt stora klickytor, text som fungerar för skärmläsare.
 
 ## Säkerhet
 

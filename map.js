@@ -2,11 +2,14 @@
 const symbolCredit = ' | Symbols by <a href="https://github.com/openstreetmap-carto/openstreetmap-carto">OSM Carto</a>';
 
 const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+    maxZoom: 18,
     attribution: '© OpenStreetMap contributors' + symbolCredit
 });
 
+// Esri has no imagery above zoom 18 around Sikeå ("Map data not yet available"),
+// which is why the map's max zoom is 18
 const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    maxZoom: 18,
     attribution: 'Tiles &copy; Esri' + symbolCredit
 });
 
@@ -70,7 +73,7 @@ const startView = parseHash() || validView(settings.center, settings.zoom);
 const map = L.map('map', {
     center: startView ? startView.center : [64.163, 20.95],
     zoom: startView ? startView.zoom : 14,
-    maxZoom: 19,
+    maxZoom: 18,
     layers: [Object.hasOwn(baseMaps, settings.baseLayer) ? baseMaps[settings.baseLayer] : osm]
 });
 
@@ -113,7 +116,7 @@ L.control.layers(baseMaps, overlays).addTo(map);
 // toggles in the layer control; overlayMarkers tracks which markers belong to each.
 const clusters = L.markerClusterGroup({
     maxClusterRadius: 35,
-    disableClusteringAtZoom: map.getMaxZoom(),
+    disableClusteringAtZoom: 17,
     showCoverageOnHover: false,
     iconCreateFunction: cluster => L.divIcon({
         html: `<div><span>${cluster.getChildCount()}</span></div>`,
@@ -134,16 +137,19 @@ map.on('overlayremove', e => {
     saveHiddenOverlays();
 });
 
-// Clustering is off at max zoom, where markers that would still cover each other
-// are placed side by side on screen. Their coordinates are unchanged. At lower
-// zoom levels such markers are always clustered, so the shift is only visible at max zoom.
+// From zoom 17 clustering is off, and markers that would still cover each other
+// are placed side by side on screen. Their coordinates are unchanged. The layout
+// depends on the zoom level, so it is recalculated on every zoom. At lower zoom
+// levels such markers are clustered, so the shift is not visible there.
 const markerSpacing = 38; // icon width + gap, in pixels
 
+map.on('zoomend', spreadOverlappingMarkers);
+
 function spreadOverlappingMarkers() {
-    const maxZoom = map.getMaxZoom();
+    const zoom = map.getZoom();
     const remaining = clusters.getLayers().map(marker => ({
         marker,
-        point: map.project(marker.getLatLng(), maxZoom)
+        point: map.project(marker.getLatLng(), zoom)
     }));
 
     while (remaining.length > 0) {
