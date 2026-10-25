@@ -217,7 +217,12 @@ function showNotice(text, hideAfterMs) {
     }
     notice.textContent = text;
     clearTimeout(noticeTimer);
-    if (hideAfterMs) noticeTimer = setTimeout(() => notice.remove(), hideAfterMs);
+    if (hideAfterMs) noticeTimer = setTimeout(hideNotice, hideAfterMs);
+}
+
+function hideNotice() {
+    clearTimeout(noticeTimer);
+    map.getContainer().querySelector('.map-notice')?.remove();
 }
 
 // 4. Own position
@@ -257,7 +262,10 @@ function startLocating() {
     centeredOnPosition = false;
     setLocateButtonActive(true);
     positionLayer.addTo(map);
-    map.locate({ watch: true, enableHighAccuracy: true });
+    showNotice('Hämtar din position…');
+    // maximumAge lets the browser reuse a recent fix. With 0, a phone standing still
+    // may not deliver anything after the watch is restarted until it moves.
+    map.locate({ watch: true, enableHighAccuracy: true, maximumAge: 30000, timeout: 20000 });
 }
 
 function stopLocating() {
@@ -266,10 +274,12 @@ function stopLocating() {
     positionLayer.clearLayers();
     positionLayer.remove();
     setLocateButtonActive(false);
+    hideNotice();
 }
 
 map.on('locationfound', e => {
     if (!locating) return;
+    if (positionLayer.getLayers().length === 0) hideNotice();
     positionLayer.clearLayers();
     L.circle(e.latlng, {
         radius: e.accuracy,
@@ -296,6 +306,10 @@ map.on('locationfound', e => {
 
 map.on('locationerror', e => {
     if (!locating) return;
+    // While watching, a timeout or temporary loss of signal is not fatal once we
+    // have a position; keep showing the last one and wait for the next update
+    const hasPosition = positionLayer.getLayers().length > 0;
+    if (e.code !== 1 && hasPosition) return;
     stopLocating();
     const message = e.code === 1
         ? 'Positionen kan inte visas eftersom webbläsaren inte har fått tillåtelse att använda den.'
