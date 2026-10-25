@@ -12,6 +12,8 @@ Använd decimala grader (till exempel `64.17027`, inte grader/minuter/sekunder).
 
 Koordinaterna skrivs som latitud först (cirka 64 här) och longitud sedan (cirka 20–21).
 
+Kartan går bara att panorera inom ett begränsat område (latitud 64.10–64.23, longitud 20.80–21.10). En punkt utanför det syns inte – då behöver området i `map.js` (`areaBounds`) utökas.
+
 ## 2. Lägg till punkten
 
 Lägg till ett nytt objekt i listan. Tänk på att:

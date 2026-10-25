@@ -106,22 +106,30 @@ body, html {
     text-align: center;
 }
 
-/* Button for showing the visitor's own position, styled like Leaflet's zoom buttons */
-.locate-button {
+/* Map buttons (overview, own position), styled like Leaflet's zoom buttons */
+.map-button {
     display: block;
     width: 30px;
     height: 30px;
     padding: 0;
     border: none;
     border-radius: 2px;
-    background: white url(symbols/locate.svg) center / 18px no-repeat;
+    background: white center / 18px no-repeat;
     cursor: pointer;
 }
 
-.locate-button:hover {
+.map-button:hover {
     background-color: #f4f4f4;
 }
 
-.locate-button.active {
+.map-button.active {
     background-color: #d2e3fc;
+}
+
+.home-button {
+    background-image: url(symbols/home.svg);
+}
+
+.locate-button {
+    background-image: url(symbols/locate.svg);
 }

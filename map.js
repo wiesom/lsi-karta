@@ -67,13 +67,23 @@ function updateHash() {
     history.replaceState(null, '', hash);
 }
 
-const startView = parseHash() || validView(settings.center, settings.zoom);
+// The map can't be panned or zoomed out far from the area, so visitors can't get lost.
+// Enlarge if points or trails are added outside it.
+const areaBounds = L.latLngBounds([64.10, 20.80], [64.23, 21.10]);
+
+// A link or remembered view outside the area is ignored, and the overview is shown instead
+const startView = [parseHash(), validView(settings.center, settings.zoom)]
+    .find(view => view && areaBounds.contains(view.center)) || null;
 
 // 2. Initialize the map
+
 const map = L.map('map', {
     center: startView ? startView.center : [64.163, 20.95],
     zoom: startView ? startView.zoom : 14,
+    minZoom: 12,
     maxZoom: 18,
+    maxBounds: areaBounds,
+    maxBoundsViscosity: 0.8,
     layers: [Object.hasOwn(baseMaps, settings.baseLayer) ? baseMaps[settings.baseLayer] : osm]
 });
 
@@ -232,23 +242,37 @@ function hideNotice() {
 const positionLayer = L.layerGroup();
 let locating = false;
 let centeredOnPosition = false;
-let locateButton;
 
-const LocateControl = L.Control.extend({
-    options: { position: 'topleft' },
-    onAdd() {
-        const container = L.DomUtil.create('div', 'leaflet-bar');
-        locateButton = L.DomUtil.create('button', 'locate-button', container);
-        locateButton.type = 'button';
-        locateButton.title = 'Visa min position';
-        locateButton.setAttribute('aria-label', 'Visa min position');
-        locateButton.setAttribute('aria-pressed', 'false');
-        L.DomEvent.disableClickPropagation(container);
-        L.DomEvent.on(locateButton, 'click', () => (locating ? stopLocating() : startLocating()));
-        return container;
-    }
+// A single map button in its own Leaflet bar, styled like the zoom buttons
+function createMapButton(className, label, onClick) {
+    let button;
+    const Control = L.Control.extend({
+        options: { position: 'topleft' },
+        onAdd() {
+            const container = L.DomUtil.create('div', 'leaflet-bar');
+            button = L.DomUtil.create('button', `map-button ${className}`, container);
+            button.type = 'button';
+            button.title = label;
+            button.setAttribute('aria-label', label);
+            L.DomEvent.disableClickPropagation(container);
+            L.DomEvent.on(button, 'click', onClick);
+            return container;
+        }
+    });
+    new Control().addTo(map);
+    return button;
+}
+
+// Back to the overview of all points, e.g. after panning far away
+let pointsBounds = null;
+createMapButton('home-button', 'Visa hela kartan', () => {
+    if (pointsBounds) map.fitBounds(pointsBounds, { padding: [50, 50] });
+    else map.fitBounds(areaBounds);
 });
-new LocateControl().addTo(map);
+
+const locateButton = createMapButton('locate-button', 'Visa min position',
+    () => (locating ? stopLocating() : startLocating()));
+locateButton.setAttribute('aria-pressed', 'false');
 
 function setLocateButtonActive(active) {
     locateButton.classList.toggle('active', active);
@@ -300,7 +324,11 @@ map.on('locationfound', e => {
     // Move to the position once; after that the visitor can pan freely
     if (!centeredOnPosition) {
         centeredOnPosition = true;
-        map.setView(e.latlng, Math.max(map.getZoom(), 16));
+        if (areaBounds.contains(e.latlng)) {
+            map.setView(e.latlng, Math.max(map.getZoom(), 16));
+        } else {
+            showNotice('Du befinner dig utanför kartans område.', 6000);
+        }
     }
 });
 
@@ -373,9 +401,9 @@ async function loadMarkers() {
         spreadOverlappingMarkers();
 
         // Only zoom to all markers when neither the URL nor a previous visit gave a view
+        pointsBounds = L.latLngBounds(markers);
         if (!startView) {
-            const bounds = L.latLngBounds(markers);
-            map.fitBounds(bounds, { padding: [50, 50] });
+            map.fitBounds(pointsBounds, { padding: [50, 50] });
         }
     } catch (error) {
         console.error('Error loading map data:', error);
