@@ -71,6 +71,8 @@ body, html {
 /* Ensure the OSM SVG image inside looks crisp */
 .custom-div-icon div img {
     display: block;
+    width: 25px;
+    height: 25px;
     filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
 }
 
@@ -78,4 +80,28 @@ body, html {
 .location-approximate div {
     border: 2px solid rgba(255, 0, 0, 0.8) !important; /* Bold Red Border */
     background: rgba(255, 200, 200, 0.6); /* Slight reddish tint to the background */
+}
+
+/* Cluster of several nearby markers */
+.marker-cluster-own div {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 0, 0, 0.6);
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Notice shown when data.json can't be loaded */
+.load-error {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    max-width: calc(100% - 140px);
+    padding: 8px 14px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.85);
+    color: white;
+    font-size: 14px;
+    text-align: center;
 }

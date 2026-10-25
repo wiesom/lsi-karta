@@ -4,21 +4,21 @@
   icon: firestation
   layer: ""
   image: ""
-  description: <p>Somthing something</p>
+  description: <p>Mer information kommer.</p>
 - title: Grillplats
   latitude: 64.1656441908743
   longitude: 20.937227945047024
   icon: firepit
   layer: ""
   image: ""
-  description: <p>Somthing something</p>
+  description: <p>Mer information kommer.</p>
 - title: Barnens bokskåp
   latitude: 64.16334405407711
   longitude: 20.939003649932495
   icon: library
   layer: ""
   image: ""
-  description: <p>Somthing something</p>
+  description: <p>Mer information kommer.</p>
 
 ## Bänkar
 - title: Bänk
