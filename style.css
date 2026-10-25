@@ -90,8 +90,8 @@ body, html {
     font-size: 14px;
 }
 
-/* Notice shown when data.json can't be loaded */
-.load-error {
+/* Message at the top of the map, e.g. when data.json can't be loaded */
+.map-notice {
     position: absolute;
     top: 10px;
     left: 50%;
@@ -104,4 +104,24 @@ body, html {
     color: white;
     font-size: 14px;
     text-align: center;
+}
+
+/* Button for showing the visitor's own position, styled like Leaflet's zoom buttons */
+.locate-button {
+    display: block;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: 2px;
+    background: white url(symbols/locate.svg) center / 18px no-repeat;
+    cursor: pointer;
+}
+
+.locate-button:hover {
+    background-color: #f4f4f4;
+}
+
+.locate-button.active {
+    background-color: #d2e3fc;
 }

@@ -205,12 +205,103 @@ function createCustomIcon(iconName, isApproximate = false, offset = [0, 0]) {
 }
 
 // Visible notice on the map when the points can't be loaded
-function showLoadError() {
-    const notice = document.createElement('div');
-    notice.className = 'load-error';
-    notice.textContent = 'Kunde inte ladda kartans platser. Försök att ladda om sidan.';
-    map.getContainer().appendChild(notice);
+// Short message shown at the top of the map; hidden after hideAfterMs if given
+let noticeTimer;
+function showNotice(text, hideAfterMs) {
+    let notice = map.getContainer().querySelector('.map-notice');
+    if (!notice) {
+        notice = document.createElement('div');
+        notice.className = 'map-notice';
+        notice.setAttribute('role', 'status');
+        map.getContainer().appendChild(notice);
+    }
+    notice.textContent = text;
+    clearTimeout(noticeTimer);
+    if (hideAfterMs) noticeTimer = setTimeout(() => notice.remove(), hideAfterMs);
 }
+
+// 4. Own position
+// Only started when the visitor presses the button, so the browser asks for
+// permission at that moment and never on page load. The choice is not remembered,
+// and the position is never stored or sent anywhere; it is only drawn on the map.
+const positionLayer = L.layerGroup();
+let locating = false;
+let centeredOnPosition = false;
+let locateButton;
+
+const LocateControl = L.Control.extend({
+    options: { position: 'topleft' },
+    onAdd() {
+        const container = L.DomUtil.create('div', 'leaflet-bar');
+        locateButton = L.DomUtil.create('button', 'locate-button', container);
+        locateButton.type = 'button';
+        locateButton.title = 'Visa min position';
+        locateButton.setAttribute('aria-label', 'Visa min position');
+        locateButton.setAttribute('aria-pressed', 'false');
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.on(locateButton, 'click', () => (locating ? stopLocating() : startLocating()));
+        return container;
+    }
+});
+new LocateControl().addTo(map);
+
+function setLocateButtonActive(active) {
+    locateButton.classList.toggle('active', active);
+    locateButton.setAttribute('aria-pressed', String(active));
+    locateButton.title = active ? 'Dölj min position' : 'Visa min position';
+    locateButton.setAttribute('aria-label', locateButton.title);
+}
+
+function startLocating() {
+    locating = true;
+    centeredOnPosition = false;
+    setLocateButtonActive(true);
+    positionLayer.addTo(map);
+    map.locate({ watch: true, enableHighAccuracy: true });
+}
+
+function stopLocating() {
+    locating = false;
+    map.stopLocate();
+    positionLayer.clearLayers();
+    positionLayer.remove();
+    setLocateButtonActive(false);
+}
+
+map.on('locationfound', e => {
+    if (!locating) return;
+    positionLayer.clearLayers();
+    L.circle(e.latlng, {
+        radius: e.accuracy,
+        interactive: false,
+        color: '#1a73e8',
+        weight: 1,
+        fillOpacity: 0.12
+    }).addTo(positionLayer);
+    L.circleMarker(e.latlng, {
+        radius: 8,
+        interactive: false,
+        color: 'white',
+        weight: 3,
+        fillColor: '#1a73e8',
+        fillOpacity: 1
+    }).addTo(positionLayer);
+
+    // Move to the position once; after that the visitor can pan freely
+    if (!centeredOnPosition) {
+        centeredOnPosition = true;
+        map.setView(e.latlng, Math.max(map.getZoom(), 16));
+    }
+});
+
+map.on('locationerror', e => {
+    if (!locating) return;
+    stopLocating();
+    const message = e.code === 1
+        ? 'Positionen kan inte visas eftersom webbläsaren inte har fått tillåtelse att använda den.'
+        : 'Det gick inte att hämta din position. Försök igen.';
+    showNotice(message, 6000);
+});
 
 // 5. Load Data
 async function loadMarkers() {
@@ -274,7 +365,7 @@ async function loadMarkers() {
         }
     } catch (error) {
         console.error('Error loading map data:', error);
-        showLoadError();
+        showNotice('Kunde inte ladda kartans platser. Försök att ladda om sidan.');
     }
 }
 
